@@ -14,6 +14,7 @@ export interface HeaderSettings {
   logo_url: string | null;
   phone: string;
   nav_links: NavLink[];
+  service_links: NavLink[];
   cta_text: string;
   cta_url: string;
 }

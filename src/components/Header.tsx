@@ -7,7 +7,7 @@ import HeaderDropdown from "./HeaderDropdown";
 import MobileMenuDropdown from "./MobileMenuDropdown";
 import SearchDialog from "./SearchDialog";
 import { useCategories } from "@/hooks/useCategories";
-import { usePublicServicePages } from "@/hooks/useServicePages";
+import { useHeaderSettings } from "@/hooks/useSiteSettings";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +15,7 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const { data: categories } = useCategories();
-  const { data: servicePages } = usePublicServicePages();
+  const { data: headerSettings } = useHeaderSettings();
 
   // Check if we're on the homepage
   const isHomepage = location.pathname === "/";
@@ -55,11 +55,9 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Build dropdown items for services from database (without Personalizim)
-  const servicesItems = servicePages?.map(sp => ({
-    label: sp.title,
-    href: `/sherbimet/${sp.slug}`,
-  })) || [];
+  const servicesItems = (headerSettings?.service_links || [])
+    .filter((l) => l.isActive !== false)
+    .map((l) => ({ label: l.label, href: l.url })) || [];
 
   // Build dropdown items for products (categories)
   const productsItems = categories?.map(c => ({

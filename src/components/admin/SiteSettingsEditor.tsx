@@ -25,8 +25,8 @@ export function SiteSettingsEditor() {
     cta_url: "/merr-nje-oferte",
   });
 
-  // Menu links state - stored with id and isActive
   const [headerNavLinks, setHeaderNavLinks] = useState<MenuLink[]>([]);
+  const [headerServiceLinks, setHeaderServiceLinks] = useState<MenuLink[]>([]);
   const [footerNavLinks, setFooterNavLinks] = useState<MenuLink[]>([]);
   const [footerServiceLinks, setFooterServiceLinks] = useState<MenuLink[]>([]);
 
@@ -50,13 +50,22 @@ export function SiteSettingsEditor() {
       });
       // Convert old format to new format with IDs
       if (headerSettings.nav_links) {
-        // Check if already in new format (has id property)
         const hasIds = headerSettings.nav_links.length > 0 && 'id' in headerSettings.nav_links[0];
         if (hasIds) {
           setHeaderNavLinks(headerSettings.nav_links as unknown as MenuLink[]);
         } else {
           setHeaderNavLinks(convertToMenuLinks(headerSettings.nav_links));
         }
+      }
+      if (headerSettings.service_links) {
+        const hasIds = headerSettings.service_links.length > 0 && 'id' in headerSettings.service_links[0];
+        if (hasIds) {
+          setHeaderServiceLinks(headerSettings.service_links as unknown as MenuLink[]);
+        } else {
+          setHeaderServiceLinks(convertToMenuLinks(headerSettings.service_links));
+        }
+      } else {
+        setHeaderServiceLinks([]);
       }
     }
   }, [headerSettings]);
@@ -97,7 +106,8 @@ export function SiteSettingsEditor() {
         key: "header", 
         value: {
           ...headerForm,
-          nav_links: headerNavLinks, // Save full format with id and isActive
+          nav_links: headerNavLinks,
+          service_links: headerServiceLinks,
         }
       });
       toast({ title: "Sukses", description: "Header u përditësua" });
@@ -215,6 +225,23 @@ export function SiteSettingsEditor() {
                   onChange={setHeaderNavLinks}
                   title="Linqet e Navigimit"
                   description="Tërhiqni për të ndryshuar renditjen, klikoni syrin për të aktivizuar/çaktivizuar"
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Shërbimet (dropdown në header)</CardTitle>
+                <CardDescription>
+                  Vetëm faqet që shtoni këtu do të shfaqen në menynë Shërbimet. Faqe të reja nuk shtohen automatikisht.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MenuLinkEditor
+                  links={headerServiceLinks}
+                  onChange={setHeaderServiceLinks}
+                  title="Linqet e Shërbimeve"
+                  description="Shtoni vetëm shërbimet që dëshironi të shfaqen në header. Tërhiqni për renditje."
                 />
               </CardContent>
             </Card>
