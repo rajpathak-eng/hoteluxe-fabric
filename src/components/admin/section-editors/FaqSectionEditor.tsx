@@ -60,6 +60,17 @@ export function FaqSectionEditor({ form, setForm }: FaqSectionEditorProps) {
         </div>
       </div>
 
+      <div className="space-y-2">
+        <Label>Teksti nën titull (intro)</Label>
+        <Textarea
+          value={form.content || ""}
+          onChange={(e) => setForm({ ...form, content: e.target.value })}
+          placeholder="p.sh. Gjeni përgjigjet për pyetjet më të zakonshme..."
+          rows={2}
+          className="resize-none"
+        />
+      </div>
+
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label>Pyetje & Përgjigje ({faqs.length})</Label>
