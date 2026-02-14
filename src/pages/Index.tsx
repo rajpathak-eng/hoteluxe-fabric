@@ -32,10 +32,9 @@ const sectionComponents: Record<string, React.ComponentType<any>> = {
 const Index = () => {
   const { data: sections, isLoading } = usePageSections("home");
 
-  // While loading, show a minimal layout with hero
   const renderSections = () => {
     if (isLoading) {
-      return null;
+      return <HeroSection />;
     }
 
     if (!sections || sections.length === 0) {

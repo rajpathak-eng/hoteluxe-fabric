@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/favicon.ico", "destination": "/logo-ema.png" },
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }
