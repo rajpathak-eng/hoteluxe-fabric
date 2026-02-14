@@ -3,9 +3,7 @@ import { Phone, ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import { usePageSection } from "@/hooks/usePageSections";
 const HeroSection = () => {
-  const {
-    data: section
-  } = usePageSection("home", "hero");
+  const { data: section, isLoading } = usePageSection("home", "hero");
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -14,13 +12,18 @@ const HeroSection = () => {
       });
     }
   };
-  const bgImage = section?.image_url || heroImage;
+  const bgImage = section ? (section.image_url || heroImage) : heroImage;
+  const showImage = !isLoading;
 
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
-      backgroundImage: `url(${bgImage})`
-    }} />
+      {/* Background Image - only set after section loaded to avoid flash of wrong image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: showImage ? `url(${bgImage})` : undefined,
+          backgroundColor: showImage ? undefined : "hsl(var(--primary))",
+        }}
+      />
       
       {/* Elegant Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/50 to-primary/70" />
