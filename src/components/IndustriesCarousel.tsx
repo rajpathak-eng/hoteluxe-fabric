@@ -45,9 +45,12 @@ interface IndustriesCarouselProps {
 }
 
 const IndustriesCarousel = ({ className = "" }: IndustriesCarouselProps) => {
-   const { data: section } = usePageSection("home", "industries");
-   const industries: IndustryItem[] = (section?.items as IndustryItem[]) || defaultIndustries;
- 
+  const { data: section, isLoading } = usePageSection("home", "industries");
+  const industries: IndustryItem[] = section
+    ? ((section.items as IndustryItem[]) || defaultIndustries)
+    : defaultIndustries;
+  const showImages = !isLoading;
+
   return (
     <section id="industries" className={`py-12 bg-background ${className}`}>
       <div className="container mx-auto px-4">
@@ -77,13 +80,17 @@ const IndustriesCarousel = ({ className = "" }: IndustriesCarouselProps) => {
                   to={industry.href}
                   className="group relative block overflow-hidden bg-background luxury-transition hover-lift h-full rounded-[15px]"
                 >
-                  {/* Image Container */}
+                  {/* Image Container - only show image after section loaded to avoid flash of old images */}
                   <div className="relative aspect-[3/4] overflow-hidden rounded-[15px]">
-                    <img
-                       src={imageMap[industry.image] || industry.image}
-                      alt={industry.title}
-                      className="absolute inset-0 w-full h-full object-cover luxury-transition group-hover:scale-105 rounded-[15px]"
-                    />
+                    {showImages ? (
+                      <img
+                        src={imageMap[industry.image] || industry.image}
+                        alt={industry.title}
+                        className="absolute inset-0 w-full h-full object-cover luxury-transition group-hover:scale-105 rounded-[15px]"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-muted rounded-[15px]" aria-hidden />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent rounded-[15px]" />
                   </div>
                   
