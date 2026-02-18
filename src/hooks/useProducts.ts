@@ -32,14 +32,12 @@ export function useProductsByCategory(categoryId: string | undefined) {
         .order("display_order", { ascending: true });
 
       if (error) throw error;
-      
-      // Extract and return products, sorted by display_order
-      const products = linkedProducts
-        ?.map((link: any) => link.products)
-        .filter(Boolean)
-        .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0));
 
-      return products as Product[];
+      const products = (linkedProducts ?? [])
+        .filter((link: { products: unknown }) => link.products)
+        .map((link: { products: Product }) => link.products);
+
+      return products;
     },
     enabled: !!categoryId,
   });
@@ -98,6 +96,7 @@ export function useFeaturedProducts() {
         .from("products")
         .select("*, product_categories(name, slug)")
         .eq("is_featured", true)
+        .order("display_order", { ascending: true })
         .limit(10);
 
       if (error) throw error;

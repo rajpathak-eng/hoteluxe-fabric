@@ -4,6 +4,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -84,9 +85,10 @@ function SortableProductItem({ product, isSelected, isChecked, onCheck, onSelect
         className="shrink-0"
       />
       <button
+        type="button"
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1 hover:bg-background/20 rounded"
+        className="touch-none cursor-grab active:cursor-grabbing p-1 hover:bg-background/20 rounded"
         title="Zvarrit për të ndryshuar renditjen"
       >
         <GripVertical className="h-4 w-4" />
@@ -175,7 +177,10 @@ export function ProductSortableList({ onSelectProduct, selectedId, onNewProduct 
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
