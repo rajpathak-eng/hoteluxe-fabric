@@ -35,8 +35,9 @@ import {
     meta_description: "",
   });
  
-   const selectedCategory = categories?.find((c) => c.id === selectedId);
- 
+  const selectedCategory = categories?.find((c) => c.id === selectedId);
+  const parentNoneValue = "__none__";
+
   useEffect(() => {
     if (selectedCategory && !isNew) {
       setForm({
@@ -67,33 +68,45 @@ import {
     });
    };
  
-   const handleSave = async () => {
-     if (!form.name || !form.slug) {
-       toast({
-         title: "Gabim",
-         description: "Emri dhe slug janë të detyrueshme",
-         variant: "destructive",
-       });
-       return;
-     }
- 
-     try {
-       if (isNew) {
-         await createCategory.mutateAsync(form as any);
-         toast({ title: "Sukses", description: "Kategoria u krijua" });
-         setIsNew(false);
-       } else if (selectedId) {
-         await updateCategory.mutateAsync({ id: selectedId, ...form });
-         toast({ title: "Sukses", description: "Kategoria u përditësua" });
-       }
-     } catch (error: any) {
-       toast({
-         title: "Gabim",
-         description: error.message,
-         variant: "destructive",
-       });
-     }
-   };
+  const handleSave = async () => {
+    if (!form.name || !form.slug) {
+      toast({
+        title: "Gabim",
+        description: "Emri dhe slug janë të detyrueshme",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const parentId = !form.parent_id || form.parent_id === parentNoneValue ? null : form.parent_id;
+    const payload = {
+      name: form.name,
+      slug: form.slug,
+      description: form.description || null,
+      image_url: form.image_url ?? null,
+      display_order: form.display_order ?? 0,
+      parent_id: parentId,
+      meta_title: form.meta_title || null,
+      meta_description: form.meta_description || null,
+    };
+
+    try {
+      if (isNew) {
+        await createCategory.mutateAsync(payload as any);
+        toast({ title: "Sukses", description: "Kategoria u krijua" });
+        setIsNew(false);
+      } else if (selectedId) {
+        await updateCategory.mutateAsync({ id: selectedId, ...payload });
+        toast({ title: "Sukses", description: "Kategoria u përditësua" });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Gabim",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
  
    const handleDelete = async () => {
      if (!selectedId) return;
@@ -203,16 +216,16 @@ import {
                 <div className="space-y-2">
                   <Label>Kategoria Prind</Label>
                   <Select
-                    value={form.parent_id || ""}
-                    onValueChange={(value) => setForm({ ...form, parent_id: value || null })}
+                    value={form.parent_id || parentNoneValue}
+                    onValueChange={(value) => setForm({ ...form, parent_id: value === parentNoneValue ? null : value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Asnjë (kategori kryesore)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Asnjë (kategori kryesore)</SelectItem>
-                      {categories
-                        ?.filter((c) => c.id !== selectedId && !c.parent_id)
+                      <SelectItem value={parentNoneValue}>Asnjë (kategori kryesore)</SelectItem>
+                      {(categories ?? [])
+                        .filter((c) => c.id !== selectedId && !c.parent_id)
                         .map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
