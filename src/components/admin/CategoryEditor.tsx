@@ -15,6 +15,7 @@ import {
   useDeleteCategory,
   CategoryFull,
 } from "@/hooks/useCms";
+import { CategorySortableList } from "./CategorySortableList";
  
  export function CategoryEditor() {
    const { data: categories, isLoading } = useCategoriesAdmin();
@@ -134,8 +135,9 @@ import {
        .replace(/(^-|-$)/g, "");
    };
  
-   return (
-     <div className="grid lg:grid-cols-3 gap-6">
+  return (
+    <div className="space-y-6">
+      <div className="grid lg:grid-cols-3 gap-6">
        {/* Category List */}
        <Card className="lg:col-span-1">
          <CardHeader className="flex flex-row items-center justify-between">
@@ -298,6 +300,9 @@ import {
            )}
          </CardContent>
        </Card>
-     </div>
+      </div>
+
+      <CategorySortableList />
+    </div>
    );
  }

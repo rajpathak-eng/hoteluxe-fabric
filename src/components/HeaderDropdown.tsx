@@ -36,6 +36,7 @@ const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: Head
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     setIsOpen(true);
   };
@@ -43,7 +44,7 @@ const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: Head
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
-    }, 150);
+    }, 200);
   };
 
   const handleItemClick = () => {
@@ -51,50 +52,57 @@ const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: Head
     onNavigate?.();
   };
 
+  const triggerClass = `text-sm font-medium tracking-wide luxury-transition relative group flex items-center gap-1 cursor-pointer border-0 bg-transparent p-0 ${
+    isScrolled ? "text-foreground" : "text-foreground"
+  }`;
+
   return (
-    <div 
+    <div
       ref={dropdownRef}
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {mainHref ? (
-        <Link
-          to={mainHref}
-          className={`text-sm font-medium tracking-wide luxury-transition relative group flex items-center gap-1 ${
-            isScrolled ? "text-foreground" : "text-primary-foreground"
-          }`}
-          onClick={handleItemClick}
-        >
-          {label}
-          <ChevronDown className={`w-3.5 h-3.5 luxury-transition ${isOpen ? "rotate-180" : ""}`} />
-          <span className="absolute -bottom-1 left-0 w-0 h-px bg-current luxury-transition group-hover:w-full" />
-        </Link>
-      ) : (
-        <button
-          className={`text-sm font-medium tracking-wide luxury-transition relative group flex items-center gap-1 ${
-            isScrolled ? "text-foreground" : "text-primary-foreground"
-          }`}
-        >
-          {label}
-          <ChevronDown className={`w-3.5 h-3.5 luxury-transition ${isOpen ? "rotate-180" : ""}`} />
-          <span className="absolute -bottom-1 left-0 w-0 h-px bg-current luxury-transition group-hover:w-full" />
-        </button>
-      )}
+      <button
+        type="button"
+        className={triggerClass}
+        onClick={(e) => {
+          e.preventDefault();
+          setIsOpen((prev) => !prev);
+        }}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        {label}
+        <ChevronDown className={`w-3.5 h-3.5 luxury-transition ${isOpen ? "rotate-180" : ""}`} />
+        <span className="absolute -bottom-1 left-0 w-0 h-px bg-current luxury-transition group-hover:w-full" />
+      </button>
 
-      {/* Dropdown Menu - positioned relative to header with higher z-index */}
-      <div 
-        className={`absolute top-full left-0 pt-2 z-[60] luxury-transition ${
-          isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
+      <div
+        className={`absolute top-full left-0 pt-1 z-[100] transition-all duration-150 ${
+          isOpen
+            ? "opacity-100 visible translate-y-0 pointer-events-auto"
+            : "opacity-0 invisible -translate-y-1 pointer-events-none"
         }`}
       >
         <div className="bg-popover border border-border rounded-md shadow-lg py-2 min-w-[220px] max-h-[70vh] overflow-y-auto flex">
+          {mainHref && (
+            <Link
+              to={mainHref}
+              className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition border-b border-border"
+              onClick={handleItemClick}
+            >
+              Të gjitha
+            </Link>
+          )}
           <div className="flex-1">
             {items.map((item, index) => (
               <div
                 key={index}
                 className="relative group"
-                onMouseEnter={() => item.subcategories && item.subcategories.length > 0 ? setHoveredItemIndex(index) : null}
+                onMouseEnter={() =>
+                  item.subcategories && item.subcategories.length > 0 ? setHoveredItemIndex(index) : setHoveredItemIndex(null)
+                }
                 onMouseLeave={() => setHoveredItemIndex(null)}
               >
                 <Link
