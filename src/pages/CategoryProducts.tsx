@@ -1,12 +1,13 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { useCategoryBySlug } from "@/hooks/useCategories";
-import { useProductsByCategory } from "@/hooks/useProducts";
+import { useCategoryBySlug, useSubcategories } from "@/hooks/useCategories";
+import { useProductsByCategory, useProductsBySubcategory } from "@/hooks/useProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DynamicSeoHead } from "@/components/seo/DynamicSeoHead";
 
 // Import local images for fallbacks
@@ -57,8 +58,18 @@ const defaultProductImage = hotelImage;
 
 const CategoryProducts = () => {
   const { categorySlug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedSubcategoryId = searchParams.get("subcategory");
+  
   const { data: category, isLoading: categoryLoading } = useCategoryBySlug(categorySlug);
-  const { data: products, isLoading: productsLoading } = useProductsByCategory(category?.id);
+  const { data: subcategories, isLoading: subcategoriesLoading } = useSubcategories(category?.id);
+  const { data: allProducts, isLoading: productsLoading } = useProductsByCategory(category?.id);
+  const { data: subcategoryProducts, isLoading: subcategoryProductsLoading } = useProductsBySubcategory(selectedSubcategoryId || undefined);
+  
+  const hasSubcategories = subcategories && subcategories.length > 0;
+  const isValidSubcategory = selectedSubcategoryId && hasSubcategories && subcategories.some(sc => sc.id === selectedSubcategoryId);
+  const products = isValidSubcategory ? subcategoryProducts : allProducts;
+  const isLoadingProducts = isValidSubcategory ? subcategoryProductsLoading : productsLoading;
 
   const openWhatsApp = (productName?: string) => {
     const phone = "355686000626";
@@ -137,9 +148,19 @@ const CategoryProducts = () => {
             </Link>
             <span className="mx-2">/</span>
             <span className="text-primary-foreground">{category.name}</span>
+            {isValidSubcategory && subcategories && (
+              <>
+                <span className="mx-2">/</span>
+                <span className="text-primary-foreground">
+                  {subcategories.find(sc => sc.id === selectedSubcategoryId)?.name}
+                </span>
+              </>
+            )}
           </nav>
           <h1 className="typo-h1 text-primary-foreground">
-            {category.name}
+            {isValidSubcategory && subcategories 
+              ? subcategories.find(sc => sc.id === selectedSubcategoryId)?.name || category.name
+              : category.name}
           </h1>
         </div>
       </section>
@@ -147,7 +168,33 @@ const CategoryProducts = () => {
       {/* Products Grid or Empty State */}
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
-          {productsLoading ? (
+          {hasSubcategories && (
+            <div className="mb-8">
+              <Tabs 
+                value={selectedSubcategoryId || "all"} 
+                onValueChange={(value) => {
+                  if (value === "all") {
+                    setSearchParams({});
+                  } else {
+                    setSearchParams({ subcategory: value });
+                  }
+                }}
+              >
+                <TabsList className="flex-wrap h-auto p-1 gap-1">
+                  <TabsTrigger value="all" className="px-4 py-2">
+                    Të gjitha
+                  </TabsTrigger>
+                  {subcategories.map((subcat) => (
+                    <TabsTrigger key={subcat.id} value={subcat.id} className="px-4 py-2">
+                      {subcat.name}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </div>
+          )}
+          
+          {isLoadingProducts ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-square rounded-sm" />

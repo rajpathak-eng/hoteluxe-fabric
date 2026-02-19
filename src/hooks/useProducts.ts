@@ -88,6 +88,34 @@ export function useProductBySlug(categorySlug: string | undefined, productSlug: 
   });
 }
 
+export function useProductsBySubcategory(subcategoryId: string | undefined) {
+  return useQuery({
+    queryKey: ["products", "subcategory", subcategoryId],
+    queryFn: async () => {
+      if (!subcategoryId) return [];
+      
+      const { data: linkedProducts, error } = await supabase
+        .from("product_category_links")
+        .select(`
+          product_id,
+          display_order,
+          products (*)
+        `)
+        .eq("category_id", subcategoryId)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+
+      const products = (linkedProducts ?? [])
+        .filter((link: { products: unknown }) => link.products)
+        .map((link: { products: Product }) => link.products);
+
+      return products;
+    },
+    enabled: !!subcategoryId,
+  });
+}
+
 export function useFeaturedProducts() {
   return useQuery({
     queryKey: ["featured-products"],

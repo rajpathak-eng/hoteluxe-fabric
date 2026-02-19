@@ -1,19 +1,20 @@
- import { useState, useEffect } from "react";
- import { Button } from "@/components/ui/button";
- import { Input } from "@/components/ui/input";
- import { Label } from "@/components/ui/label";
- import { Textarea } from "@/components/ui/textarea";
- import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
- import { ImageUpload } from "./ImageUpload";
- import { toast } from "@/hooks/use-toast";
- import { Loader2, Save, Trash2, Plus } from "lucide-react";
- import {
-   useCategoriesAdmin,
-   useCreateCategory,
-   useUpdateCategory,
-   useDeleteCategory,
-   CategoryFull,
- } from "@/hooks/useCms";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ImageUpload } from "./ImageUpload";
+import { toast } from "@/hooks/use-toast";
+import { Loader2, Save, Trash2, Plus } from "lucide-react";
+import {
+  useCategoriesAdmin,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  CategoryFull,
+} from "@/hooks/useCms";
  
  export function CategoryEditor() {
    const { data: categories, isLoading } = useCategoriesAdmin();
@@ -23,44 +24,47 @@
  
    const [selectedId, setSelectedId] = useState<string | null>(null);
    const [isNew, setIsNew] = useState(false);
-   const [form, setForm] = useState<Partial<CategoryFull>>({
-     name: "",
-     slug: "",
-     description: "",
-     image_url: null,
-     display_order: 0,
-     meta_title: "",
-     meta_description: "",
-   });
+  const [form, setForm] = useState<Partial<CategoryFull>>({
+    name: "",
+    slug: "",
+    description: "",
+    image_url: null,
+    display_order: 0,
+    parent_id: null,
+    meta_title: "",
+    meta_description: "",
+  });
  
    const selectedCategory = categories?.find((c) => c.id === selectedId);
  
-   useEffect(() => {
-     if (selectedCategory && !isNew) {
-       setForm({
-         name: selectedCategory.name || "",
-         slug: selectedCategory.slug || "",
-         description: selectedCategory.description || "",
-         image_url: selectedCategory.image_url || null,
-         display_order: selectedCategory.display_order || 0,
-         meta_title: selectedCategory.meta_title || "",
-         meta_description: selectedCategory.meta_description || "",
-       });
-     }
-   }, [selectedCategory, isNew]);
+  useEffect(() => {
+    if (selectedCategory && !isNew) {
+      setForm({
+        name: selectedCategory.name || "",
+        slug: selectedCategory.slug || "",
+        description: selectedCategory.description || "",
+        image_url: selectedCategory.image_url || null,
+        display_order: selectedCategory.display_order || 0,
+        parent_id: selectedCategory.parent_id || null,
+        meta_title: selectedCategory.meta_title || "",
+        meta_description: selectedCategory.meta_description || "",
+      });
+    }
+  }, [selectedCategory, isNew]);
  
    const handleNew = () => {
      setIsNew(true);
      setSelectedId(null);
-     setForm({
-       name: "",
-       slug: "",
-       description: "",
-       image_url: null,
-       display_order: 0,
-       meta_title: "",
-       meta_description: "",
-     });
+    setForm({
+      name: "",
+      slug: "",
+      description: "",
+      image_url: null,
+      display_order: 0,
+      parent_id: null,
+      meta_title: "",
+      meta_description: "",
+    });
    };
  
    const handleSave = async () => {
@@ -186,15 +190,38 @@
                  </div>
                </div>
  
-               <div className="space-y-2">
-                 <Label>Renditja</Label>
-                 <Input
-                   type="number"
-                   value={form.display_order}
-                   onChange={(e) => setForm({ ...form, display_order: parseInt(e.target.value) || 0 })}
-                   className="w-32"
-                 />
-               </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Renditja</Label>
+                  <Input
+                    type="number"
+                    value={form.display_order}
+                    onChange={(e) => setForm({ ...form, display_order: parseInt(e.target.value) || 0 })}
+                    className="w-32"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Kategoria Prind</Label>
+                  <Select
+                    value={form.parent_id || ""}
+                    onValueChange={(value) => setForm({ ...form, parent_id: value || null })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Asnjë (kategori kryesore)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Asnjë (kategori kryesore)</SelectItem>
+                      {categories
+                        ?.filter((c) => c.id !== selectedId && !c.parent_id)
+                        .map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
  
                <div className="space-y-2">
                  <Label>Përshkrimi</Label>

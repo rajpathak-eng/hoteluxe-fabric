@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface DropdownItem {
   label: string;
   href: string;
+  subcategories?: DropdownItem[];
 }
 
 interface HeaderDropdownProps {
@@ -17,6 +18,7 @@ interface HeaderDropdownProps {
 
 const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: HeaderDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hoveredItemIndex, setHoveredItemIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -86,17 +88,42 @@ const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: Head
           isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"
         }`}
       >
-        <div className="bg-popover border border-border rounded-md shadow-lg py-2 min-w-[220px] max-h-[70vh] overflow-y-auto">
-          {items.map((item, index) => (
-            <Link
-              key={index}
-              to={item.href}
-              className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
-              onClick={handleItemClick}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="bg-popover border border-border rounded-md shadow-lg py-2 min-w-[220px] max-h-[70vh] overflow-y-auto flex">
+          <div className="flex-1">
+            {items.map((item, index) => (
+              <div
+                key={index}
+                className="relative group"
+                onMouseEnter={() => item.subcategories && item.subcategories.length > 0 ? setHoveredItemIndex(index) : null}
+                onMouseLeave={() => setHoveredItemIndex(null)}
+              >
+                <Link
+                  to={item.href}
+                  className="flex items-center justify-between px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
+                  onClick={handleItemClick}
+                >
+                  <span>{item.label}</span>
+                  {item.subcategories && item.subcategories.length > 0 && (
+                    <ChevronRight className="w-3.5 h-3.5 ml-2" />
+                  )}
+                </Link>
+                {item.subcategories && item.subcategories.length > 0 && hoveredItemIndex === index && (
+                  <div className="absolute left-full top-0 ml-1 bg-popover border border-border rounded-md shadow-lg py-2 min-w-[200px] z-[70]">
+                    {item.subcategories.map((subcat, subIndex) => (
+                      <Link
+                        key={subIndex}
+                        to={subcat.href}
+                        className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
+                        onClick={handleItemClick}
+                      >
+                        {subcat.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

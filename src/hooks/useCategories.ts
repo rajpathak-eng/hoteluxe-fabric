@@ -43,3 +43,21 @@ export function useCategoryBySlug(slug: string | undefined) {
     enabled: !!slug,
   });
 }
+
+export function useSubcategories(parentId: string | null | undefined) {
+  return useQuery({
+    queryKey: ["subcategories", parentId],
+    queryFn: async () => {
+      if (!parentId) return [];
+      const { data, error } = await supabase
+        .from("product_categories")
+        .select("*")
+        .eq("parent_id", parentId)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+      return data as ProductCategory[];
+    },
+    enabled: !!parentId,
+  });
+}

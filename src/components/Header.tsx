@@ -59,11 +59,31 @@ const Header = () => {
     .filter((l) => l.isActive !== false)
     .map((l) => ({ label: l.label, href: l.url })) || [];
 
-  // Build dropdown items for products (categories)
-  const productsItems = categories?.map(c => ({
-    label: c.name,
-    href: `/produktet/${c.slug}`,
-  })) || [];
+  // Build dropdown items for products (categories with subcategories)
+  const productsItems = categories
+    ?.filter(c => !c.parent_id)
+    .map(c => {
+      const subcategories = categories.filter(sc => sc.parent_id === c.id).sort((a, b) => a.display_order - b.display_order);
+      if (subcategories.length > 0) {
+        return {
+          label: c.name,
+          href: `/produktet/${c.slug}`,
+          subcategories: subcategories.map(sc => ({
+            label: sc.name,
+            href: `/produktet/${c.slug}?subcategory=${sc.id}`,
+          })),
+        };
+      }
+      return {
+        label: c.name,
+        href: `/produktet/${c.slug}`,
+      };
+    })
+    .sort((a, b) => {
+      const catA = categories?.find(c => `/produktet/${c.slug}` === a.href);
+      const catB = categories?.find(c => `/produktet/${c.slug}` === b.href);
+      return (catA?.display_order || 0) - (catB?.display_order || 0);
+    }) || [];
 
 
   return (
