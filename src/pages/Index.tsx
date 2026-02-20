@@ -38,7 +38,6 @@ const Index = () => {
     }
 
     if (!sections || sections.length === 0) {
-      // Fallback: show default order if no DB sections
       return (
         <>
           <HeroSection />
@@ -55,17 +54,21 @@ const Index = () => {
       );
     }
 
-    return sections.map((section) => {
-      const Component = sectionComponents[section.section_key];
-      if (!Component) return null;
+    const hasHero = sections.some((s) => s.section_key === "hero");
 
-      // Pass section data for components that accept it
-      if (section.section_key === "video" || section.section_key === "featured-products") {
-        return <Component key={section.id} section={section} />;
-      }
-
-      return <Component key={section.id} />;
-    });
+    return (
+      <>
+        {!hasHero && <HeroSection key="hero-fallback" />}
+        {sections.map((section) => {
+          const Component = sectionComponents[section.section_key];
+          if (!Component) return null;
+          if (section.section_key === "video" || section.section_key === "featured-products") {
+            return <Component key={section.id} section={section} />;
+          }
+          return <Component key={section.id} />;
+        })}
+      </>
+    );
   };
 
   return (

@@ -85,53 +85,68 @@ const HeaderDropdown = ({ label, items, isScrolled, mainHref, onNavigate }: Head
             : "opacity-0 invisible -translate-y-1 pointer-events-none"
         }`}
       >
-        <div className="bg-popover border border-border rounded-md shadow-lg py-2 min-w-[220px] max-h-[70vh] overflow-y-auto flex">
-          {mainHref && (
-            <Link
-              to={mainHref}
-              className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition border-b border-border"
-              onClick={handleItemClick}
-            >
-              Të gjitha
-            </Link>
-          )}
-          <div className="flex-1">
+        <div className="flex overflow-visible rounded-md shadow-lg border border-border bg-popover">
+          <div className="min-w-[220px] max-h-[70vh] overflow-y-auto py-2">
+            {mainHref && (
+              <Link
+                to={mainHref}
+                className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition border-b border-border"
+                onClick={handleItemClick}
+              >
+                Të gjitha
+              </Link>
+            )}
             {items.map((item, index) => (
               <div
                 key={index}
-                className="relative group"
+                className="relative"
                 onMouseEnter={() =>
-                  item.subcategories && item.subcategories.length > 0 ? setHoveredItemIndex(index) : setHoveredItemIndex(null)
+                  item.subcategories && item.subcategories.length > 0
+                    ? setHoveredItemIndex(index)
+                    : setHoveredItemIndex(null)
                 }
                 onMouseLeave={() => setHoveredItemIndex(null)}
               >
                 <Link
                   to={item.href}
-                  className="flex items-center justify-between px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
+                  className={`flex items-center justify-between gap-2 px-4 py-2.5 text-sm text-popover-foreground luxury-transition ${
+                    hoveredItemIndex === index && item.subcategories?.length
+                      ? "bg-muted"
+                      : "hover:bg-muted"
+                  }`}
                   onClick={handleItemClick}
                 >
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                   {item.subcategories && item.subcategories.length > 0 && (
-                    <ChevronRight className="w-3.5 h-3.5 ml-2" />
+                    <ChevronRight className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
                   )}
                 </Link>
-                {item.subcategories && item.subcategories.length > 0 && hoveredItemIndex === index && (
-                  <div className="absolute left-full top-0 ml-1 bg-popover border border-border rounded-md shadow-lg py-2 min-w-[200px] z-[70]">
-                    {item.subcategories.map((subcat, subIndex) => (
-                      <Link
-                        key={subIndex}
-                        to={subcat.href}
-                        className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
-                        onClick={handleItemClick}
-                      >
-                        {subcat.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
           </div>
+          {hoveredItemIndex !== null &&
+            items[hoveredItemIndex]?.subcategories &&
+            items[hoveredItemIndex].subcategories!.length > 0 && (
+              <div
+                className="min-w-[200px] max-h-[70vh] overflow-y-auto py-2 border-l border-border bg-muted/30"
+                onMouseEnter={() => setHoveredItemIndex(hoveredItemIndex)}
+                onMouseLeave={() => setHoveredItemIndex(null)}
+              >
+                <div className="px-3 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border">
+                  {items[hoveredItemIndex].label}
+                </div>
+                {items[hoveredItemIndex].subcategories!.map((subcat, subIndex) => (
+                  <Link
+                    key={subIndex}
+                    to={subcat.href}
+                    className="block px-4 py-2.5 text-sm text-popover-foreground hover:bg-muted luxury-transition"
+                    onClick={handleItemClick}
+                  >
+                    {subcat.label}
+                  </Link>
+                ))}
+              </div>
+            )}
         </div>
       </div>
     </div>
