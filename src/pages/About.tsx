@@ -125,24 +125,26 @@ function renderSection(section: PageSection) {
 
 function AboutHero({ section }: { section: PageSection }) {
   return (
-    <section className="relative pt-32 pb-20 bg-background overflow-hidden">
+    <section className="relative h-[70vh] min-h-[500px] bg-background overflow-hidden">
       {section.image_url && (
         <>
           <img src={section.image_url} alt={section.title || ""} className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/50 to-primary/70" />
         </>
       )}
-      <div className="relative container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className={`typo-label mb-4 ${section.image_url ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-            {section.subtitle || "Rreth nesh"}
-          </span>
-          <h1 className={`typo-h1 mb-6 ${section.image_url ? "text-primary-foreground" : "text-foreground"}`}>
-            {section.title || "Zgjidhje tekstilesh profesionale për Biznesin tuaj"}
-          </h1>
-          <p className={`typo-body max-w-3xl mx-auto md:text-lg ${section.image_url ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
-            {section.content || ""}
-          </p>
+      <div className="absolute inset-0 flex items-center">
+        <div className="relative container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <span className={`typo-label mb-4 ${section.image_url ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+              {section.subtitle || "Rreth nesh"}
+            </span>
+            <h1 className={`typo-h1 mb-6 ${section.image_url ? "text-primary-foreground" : "text-foreground"}`}>
+              {section.title || "Zgjidhje tekstilesh profesionale për Biznesin tuaj"}
+            </h1>
+            <p className={`typo-body max-w-3xl mx-auto md:text-lg ${section.image_url ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
+              {section.content || ""}
+            </p>
+          </div>
         </div>
       </div>
     </section>
