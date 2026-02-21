@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, ArrowRight } from "lucide-react";
+import { Phone, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import { usePageSection } from "@/hooks/usePageSections";
 
@@ -104,21 +104,39 @@ const HeroSection = () => {
       </div>
 
       {showImage && images.length > 1 && (
-        <div className="absolute bottom-8 left-0 right-0 z-10 flex justify-center gap-2">
-          {images.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setCurrentIndex(i)}
-              className="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50"
-              style={{
-                width: i === currentIndex ? 24 : 8,
-                backgroundColor: i === currentIndex ? "hsl(var(--primary-foreground))" : "hsl(var(--primary-foreground) / 0.4)",
-              }}
-              aria-label={`Slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        <>
+          <button
+            type="button"
+            onClick={() => setCurrentIndex((i) => (i - 1 + images.length) % images.length)}
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground"
+            aria-label="Slide paraardhës"
+          >
+            <ChevronLeft className="h-7 w-7" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentIndex((i) => (i + 1) % images.length)}
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground"
+            aria-label="Slide tjetër"
+          >
+            <ChevronRight className="h-7 w-7" />
+          </button>
+          <div className="absolute bottom-8 left-0 right-0 z-10 flex justify-center gap-2">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setCurrentIndex(i)}
+                className="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/50"
+                style={{
+                  width: i === currentIndex ? 24 : 8,
+                  backgroundColor: i === currentIndex ? "hsl(var(--primary-foreground))" : "hsl(var(--primary-foreground) / 0.4)",
+                }}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );
