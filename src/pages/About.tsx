@@ -123,13 +123,28 @@ function renderSection(section: PageSection) {
   }
 }
 
+function getAboutHeroOverlay(items: PageSection["items"]) {
+  const obj = items && typeof items === "object" && !Array.isArray(items) ? (items as Record<string, unknown>) : {};
+  return {
+    enabled: obj.overlay_enabled !== false,
+    opacity: typeof obj.overlay_opacity === "number" ? Math.min(100, Math.max(0, obj.overlay_opacity)) / 100 : 0.5,
+  };
+}
+
 function AboutHero({ section }: { section: PageSection }) {
+  const overlay = getAboutHeroOverlay(section.items);
+
   return (
     <section className="relative h-[70vh] min-h-[500px] bg-background overflow-hidden">
       {section.image_url && (
         <>
           <img src={section.image_url} alt={section.title || ""} className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/50 to-primary/70" />
+          {overlay.enabled && (
+            <div
+              className="absolute inset-0 bg-gradient-to-b from-primary via-primary to-primary"
+              style={{ opacity: overlay.opacity }}
+            />
+          )}
         </>
       )}
       <div className="absolute inset-0 flex items-center">
