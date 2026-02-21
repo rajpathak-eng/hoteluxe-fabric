@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Phone, ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import { usePageSection } from "@/hooks/usePageSections";
+
 const HeroSection = () => {
   const { data: section, isLoading } = usePageSection("home", "hero");
+  const { data: sectionHomepage } = usePageSection("home", "hero-homepage");
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -12,7 +14,11 @@ const HeroSection = () => {
       });
     }
   };
-  const bgImage = section ? (section.image_url || heroImage) : heroImage;
+  const imageFromHero = section?.image_url;
+  const imageFromHomepage = Array.isArray(sectionHomepage?.items) && sectionHomepage.items.length > 0
+    ? (sectionHomepage.items[0] as { image_url?: string })?.image_url
+    : null;
+  const bgImage = imageFromHero || imageFromHomepage || heroImage;
   const showImage = !isLoading;
 
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">

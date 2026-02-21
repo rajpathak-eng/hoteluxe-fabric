@@ -205,28 +205,32 @@
        if (error) throw error;
        return result;
      },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["page-sections"] });
-     },
-   });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["page-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["public-page-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["public-page-section"] });
+    },
+  });
  }
- 
+
  export function useCreatePageSection() {
-   const queryClient = useQueryClient();
-   return useMutation({
-     mutationFn: async (section: Omit<PageSection, "id">) => {
-       const { data, error } = await supabase
-         .from("page_sections")
-         .insert(section)
-         .select()
-         .single();
-       if (error) throw error;
-       return data;
-     },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["page-sections"] });
-     },
-   });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (section: Omit<PageSection, "id">) => {
+      const { data, error } = await supabase
+        .from("page_sections")
+        .insert(section)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["page-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["public-page-sections"] });
+      queryClient.invalidateQueries({ queryKey: ["public-page-section"] });
+    },
+  });
  }
  
 // Products (extended)
